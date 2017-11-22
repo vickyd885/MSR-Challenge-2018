@@ -17,7 +17,14 @@ public class Filter{
 
   public static void main(String[] args) {
 
-    readAllEvents();
+    //readPlainEvents();
+
+    List<String> users = findAllUsers();
+
+    //for(String x : users) System.out.println(x);
+
+    System.out.println("Running");
+    readPlainEvents();
   }
 
   /**
@@ -34,68 +41,73 @@ public class Filter{
     return zips;
   }
 
-  /**
-	 * 2: Reading events
+  // /**
+	//  * 2: Reading events
+	//  */
+	// public static void readAllEvents() {
+	// 	// each .zip file corresponds to a user
+	// 	List<String> userZips = findAllUsers();
+  //
+	// 	for (String user : userZips) {
+	// 		// you can use our helper to open a file...
+	// 		ReadingArchive ra = new ReadingArchive(new File(user));
+	// 		// ...iterate over it...
+	// 		while (ra.hasNext()) {
+	// 			// ... and desrialize the IDE event.
+	// 			IIDEEvent e = ra.getNext(IIDEEvent.class);
+	// 			// afterwards, you can process it as a Java object
+	// 			//process(e);
+  //
+  //
+	// 		}
+	// 		ra.close();
+	// 	}
+	// }
+
+	/**
+	 * 3: Reading the plain JSON representation
 	 */
-	public static void readAllEvents() {
-		// each .zip file corresponds to a user
+	public static void readPlainEvents() {
+		// the example is basically the same as before, but...
 		List<String> userZips = findAllUsers();
 
 		for (String user : userZips) {
-			// you can use our helper to open a file...
 			ReadingArchive ra = new ReadingArchive(new File(user));
-			// ...iterate over it...
 			while (ra.hasNext()) {
-				// ... and desrialize the IDE event.
-				IIDEEvent e = ra.getNext(IIDEEvent.class);
-				// afterwards, you can process it as a Java object
-				//process(e);
+        //System.out.println("Hi");
+				// ... sometimes it is easier to just read the JSON...
+				String json = ra.getNextPlain();
+				// .. and call the deserializer yourself.
+				IIDEEvent e = JsonUtils.fromJson(json, IIDEEvent.class);
+
+        //process(e);
+
+				// Not all event bindings are very stable already, reading the
+				// JSON helps debugging possible bugs in the bindings
 			}
 			ra.close();
 		}
 	}
 
 	/**
-	 * 3: Reading the plain JSON representation
-	 */
-	// public static void readPlainEvents() {
-	// 	// the example is basically the same as before, but...
-	// 	List<String> userZips = findAllUsers();
-  //
-	// 	for (String user : userZips) {
-	// 		ReadingArchive ra = new ReadingArchive(new File(user));
-	// 		while (ra.hasNext()) {
-	// 			// ... sometimes it is easier to just read the JSON...
-	// 			String json = ra.getNextPlain();
-	// 			// .. and call the deserializer yourself.
-	// 			IIDEEvent e = JsonUtils.fromJson(json, IIDEEvent.class);
-	// 			process(e);
-  //
-	// 			// Not all event bindings are very stable already, reading the
-	// 			// JSON helps debugging possible bugs in the bindings
-	// 		}
-	// 		ra.close();
-	// 	}
-	// }
-  //
-	/**
 	 * 4: Processing events
 	 */
-	// private static void process(IIDEEvent event) {
-	// 	// once you have access to the instantiated event you can dispatch the
-	// 	// type. As the events are not nested, we did not implement the visitor
-	// 	// pattern, but resorted to instanceof checks.
-	// 	if (event instanceof CommandEvent) {
-	// 		// if the correct type is identified, you can cast it...
-	// 		CommandEvent ce = (CommandEvent) event;
-	// 		// ...and access the special context for this kind of event
-	// 		System.out.println(ce.CommandId);
-	// 	} else {
-	// 		// there a many different event types to process, it is recommended
-	// 		// that you browse the package to see all types and consult the
-	// 		// website for the documentation of the semantics of each event...
-	// 	}
-	// }
+	private static void process(IIDEEvent event) {
+		// once you have access to the instantiated event you can dispatch the
+		// type. As the events are not nested, we did not implement the visitor
+		// pattern, but resorted to instanceof checks.
+    System.out.println(event);
+		// if (event instanceof CommandEvent) {
+		// 	// if the correct type is identified, you can cast it...
+		// 	CommandEvent ce = (CommandEvent) event;
+		// 	// ...and access the special context for this kind of event
+		// 	System.out.println(ce.CommandId);
+		// } else {
+		// 	// there a many different event types to process, it is recommended
+		// 	// that you browse the package to see all types and consult the
+		// 	// website for the documentation of the semantics of each event...
+		// }
+	}
 
 
 }
