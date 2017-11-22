@@ -5,8 +5,11 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import com.google.common.collect.Lists;
 
-import cc.kave.commons.model.events.CommandEvent;
+import cc.kave.commons.model.events.visualstudio.EditEvent;
 import cc.kave.commons.model.events.IIDEEvent;
+import cc.kave.commons.model.events.versioncontrolevents.VersionControlEvent;
+import cc.kave.commons.model.events.versioncontrolevents.VersionControlAction;
+import cc.kave.commons.model.events.versioncontrolevents.VersionControlActionType;
 import cc.kave.commons.utils.json.JsonUtils;
 import cc.recommenders.io.ReadingArchive;
 
@@ -80,7 +83,7 @@ public class Filter{
 				// .. and call the deserializer yourself.
 				IIDEEvent e = JsonUtils.fromJson(json, IIDEEvent.class);
 
-        //process(e);
+        process(e);
 
 				// Not all event bindings are very stable already, reading the
 				// JSON helps debugging possible bugs in the bindings
@@ -96,17 +99,38 @@ public class Filter{
 		// once you have access to the instantiated event you can dispatch the
 		// type. As the events are not nested, we did not implement the visitor
 		// pattern, but resorted to instanceof checks.
-    System.out.println(event);
-		// if (event instanceof CommandEvent) {
-		// 	// if the correct type is identified, you can cast it...
-		// 	CommandEvent ce = (CommandEvent) event;
-		// 	// ...and access the special context for this kind of event
-		// 	System.out.println(ce.CommandId);
-		// } else {
-		// 	// there a many different event types to process, it is recommended
-		// 	// that you browse the package to see all types and consult the
-		// 	// website for the documentation of the semantics of each event...
-		// }
+    //System.out.println(event);
+		if (event instanceof EditEvent) {
+			// if the correct type is identified, you can cast it...
+			EditEvent ee = (EditEvent) event;
+			// ...and access the special context for this kind of event
+			//System.out.println(ee);
+
+      System.out.println("NumberOfChanges: " + ee.NumberOfChanges);
+      System.out.println("SizeOfChanges: " + ee.SizeOfChanges);
+      System.out.println();
+		} else if( event instanceof VersionControlEvent) {
+
+      VersionControlEvent vce = (VersionControlEvent) event;
+
+      System.out.println("VCE! ");
+      System.out.println();
+
+      List<VersionControlAction> listOfActions = vce.Actions;
+
+      System.out.println("List of actions for that VCE...");
+      for(VersionControlAction action : listOfActions){
+
+        System.out.println(action);
+        System.out.print("Type " + action.ActionType);
+
+      }
+
+    }else{
+			// there a many different event types to process, it is recommended
+			// that you browse the package to see all types and consult the
+			// website for the documentation of the semantics of each event...
+		}
 	}
 
 
