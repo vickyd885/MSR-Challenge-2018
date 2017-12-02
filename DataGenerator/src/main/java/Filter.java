@@ -1,12 +1,19 @@
 
 import java.io.File;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import com.google.common.collect.Lists;
 
-import cc.kave.commons.model.events.visualstudio.EditEvent;
+// Events we are interested in
+import cc.kave.commons.model.events.visualstudio.*;
+import cc.kave.commons.model.events.testrunevents.*;
+import cc.kave.commons.model.events.ErrorEvent;
+
+
 import cc.kave.commons.model.events.IIDEEvent;
 import cc.kave.commons.model.events.versioncontrolevents.VersionControlEvent;
 import cc.kave.commons.model.events.versioncontrolevents.VersionControlAction;
@@ -100,7 +107,7 @@ public class Filter{
 				// Not all event bindings are very stable already, reading the
 				// JSON helps debugging possible bugs in the bindings
 
-        if(limit > 10) break;
+        if(limit > 500) break;
 
 			}
 			ra.close();
@@ -112,51 +119,80 @@ public class Filter{
 	 * 4: Processing events
 	 */
 	private static void process(IIDEEvent event, DataCollector dc) {
-		// once you have access to the instantiated event you can dispatch the
-		// type. As the events are not nested, we did not implement the visitor
-		// pattern, but resorted to instanceof checks.
-    //System.out.println(event);
 
     String timeStamp = event.getTriggeredAt().toString();
     String eventType = null;
     HashMap<String, Object> specificData = new HashMap<String, Object>();
 
 		if (event instanceof EditEvent) {
-			// if the correct type is identified, you can cast it...
 			EditEvent ee = (EditEvent) event;
-
       eventType = "EditEvent";
-
       specificData.put("NumberOfChanges", ee.NumberOfChanges);
-      specificData.put("SizeOfChanges", ee.NumberOfChanges);
+      specificData.put("SizeOfChanges", ee.SizeOfChanges);
+		} else if(event instanceof BuildEvent) {
 
-			// ...and access the special context for this kind of event
-			//System.out.println(ee);
+      //System.out.println("Looking at BE");
+      BuildEvent be = (BuildEvent) event;
+      eventType = "BuildEvent";
+      specificData.put("Scope", be.Scope);
+      specificData.put("Action", be.Action);
 
-      // System.out.println("NumberOfChanges: " + ee.NumberOfChanges);
-      // System.out.println("SizeOfChanges: " + ee.SizeOfChanges);
-      // System.out.println();
-		} else if( event instanceof VersionControlEvent) {
-      //
-      // VersionControlEvent vce = (VersionControlEvent) event;
-      //
-      // System.out.println("VCE! ");
-      // System.out.println();
-      //
-      // List<VersionControlAction> listOfActions = vce.Actions;
-      //
-      // System.out.println("List of actions for that VCE...");
-      // for(VersionControlAction action : listOfActions){
-      //
-      //   System.out.println(action);
-      //   System.out.print("Type " + action.ActionType);
-      //
-      // }
+      List<BuildTarget> buildTargets = be.Targets;
+      HashMap<Integer, Object> buildData = new HashMap<Integer, Object>();
 
-    }else{
-			// there a many different event types to process, it is recommended
-			// that you browse the package to see all types and consult the
-			// website for the documentation of the semantics of each event...
+      int buildTargetCount = 0;
+      for(BuildTarget bt : buildTargets){
+        HashMap<String, Object> localBTMap = new HashMap<String, Object>();
+        localBTMap.put("StartedAt", bt.StartedAt.toString());
+        localBTMap.put("Duration", bt.Duration.toString());
+        localBTMap.put("Successful", bt.Successful);
+
+        buildData.put(++buildTargetCount, localBTMap);
+      }
+
+      specificData.put("build_data", buildData);
+
+    } else if(event instanceof DebuggerEvent){
+      DebuggerEvent de = (DebuggerEvent) event;
+      eventType = "DebuggerEvent";
+
+      specificData.put("DebuggerMode", de.Mode.toString());
+      specificData.put("Reason", de.Reason);
+      specificData.put("Action", de.Action);
+
+    } else if(event instanceof IDEStateEvent){
+      IDEStateEvent idse = (IDEStateEvent) event;
+
+      eventType = "LifeCyclePhase";
+      specificData.put("state", idse.IDELifecyclePhase.toString());
+
+    } else if(event instanceof ErrorEvent){
+      ErrorEvent ee = (ErrorEvent)event;
+
+      eventType = "ErrorEvent";
+      specificData.put("Content", ee.Content);
+      specificData.put("StackTrace", ee.StackTrace);
+
+    } else if(event instanceof TestRunEvent){
+      TestRunEvent tre = (TestRunEvent) event;
+
+      eventType = "TestRunEvent";
+      specificData.put("WasAborted", tre.WasAborted);
+
+      HashMap<Integer, Object> testResults = new HashMap<Integer, Object>();
+
+      Set<TestCaseResult> tests = tre.Tests;
+
+      int testCount = 0;
+      for(TestCaseResult tcr : tests){
+        HashMap<String, Object> localTestResult = new HashMap<String, Object>();
+        localTestResult.put("Duration", tcr.Duration.toString());
+        localTestResult.put("Result", tcr.Result.toString());
+        testResults.put(++testCount, localTestResult);
+      }
+      specificData.put("Tests", testResults);
+    } else{
+      // Looking at an undesired event
 		}
 
     if(eventType != null){
@@ -167,7 +203,7 @@ public class Filter{
 
 	}
 
-  private static void
+
 
 
 
