@@ -82,7 +82,8 @@ public class Filter{
 				// Not all event bindings are very stable already, reading the
 				// JSON helps debugging possible bugs in the bindings
 
-        if(dc.getNumOfEvents() > 5) break;
+        // Uncomment to stop at a certain event count
+        //if(dc.getNumOfEvents() > 5) break;
 
 			}
 			ra.close();
