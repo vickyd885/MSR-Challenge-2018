@@ -1,6 +1,7 @@
 
 import java.io.File;
 import java.util.List;
+import java.util.HashMap;
 
 import org.apache.commons.io.FileUtils;
 import com.google.common.collect.Lists;
@@ -100,7 +101,7 @@ public class Filter{
 				// JSON helps debugging possible bugs in the bindings
 
         if(limit > 10) break;
-        
+
 			}
 			ra.close();
       dc.flushData();
@@ -118,6 +119,7 @@ public class Filter{
 
     String timeStamp = event.getTriggeredAt().toString();
     String eventType = null;
+    HashMap<String, Object> specificData = new HashMap<String, Object>();
 
 		if (event instanceof EditEvent) {
 			// if the correct type is identified, you can cast it...
@@ -125,6 +127,8 @@ public class Filter{
 
       eventType = "EditEvent";
 
+      specificData.put("NumberOfChanges", ee.NumberOfChanges);
+      specificData.put("SizeOfChanges", ee.NumberOfChanges);
 
 			// ...and access the special context for this kind of event
 			//System.out.println(ee);
@@ -156,12 +160,14 @@ public class Filter{
 		}
 
     if(eventType != null){
-      dc.handleNewEntry(timeStamp, eventType);
+      dc.handleNewEntry(timeStamp, eventType, specificData);
       limit++;
     }
 
 
 	}
+
+  private static void
 
 
 
