@@ -83,12 +83,13 @@ public class Filter{
 				// JSON helps debugging possible bugs in the bindings
 
         // Uncomment to stop at a certain event count
-        //if(dc.getNumOfEvents() > 5) break;
+        //if(dc.getNumOfEvents() > 10) break;
 
 			}
 			ra.close();
       dc.flushData();
-      dc.printTimeInfo();
+      //dc.printTimeInfo();
+      //dc.showAllKeysInTM();
 		}
 	}
 
@@ -110,6 +111,7 @@ public class Filter{
     // In the end, if eventType is still null, then we don't add the event to
     // json.
     String timeStamp = event.getTriggeredAt().toString();
+
     String eventType = null;
     HashMap<String, Object> specificData = new HashMap<String, Object>();
 
@@ -182,15 +184,29 @@ public class Filter{
         testResults.put(++testCount, localTestResult);
       }
 
-      System.out.println("Number of test cases: " + testCount);
+      //System.out.println("Number of test cases: " + testCount);
       specificData.put("ListOfTests", testResults);
+    } else if(event instanceof VersionControlEvent){
+      VersionControlEvent vce = (VersionControlEvent) event;
+
+      //System.out.println(vce);
+      List<VersionControlAction> listOfvca = vce.Actions;
+
+      // System.out.println("List of VCA");
+      for(VersionControlAction vca : listOfvca){
+        eventType = "VersionControlEvent";
+        timeStamp = vca.ExecutedAt.toString();
+        specificData.put("Action", vca.ActionType.toString());
+        dc.handleNewEntry(timeStamp, eventType, specificData);
+      }
+
     } else{
       // Looking at an undesired event so do nothing
 		}
 
     // if the eventType is not set, then we're not interested in the event,
     // and so it doesnt get added to the json
-    if(eventType != null){
+    if(eventType != null && !eventType.equals("VersionControlEvent")){
       dc.handleNewEntry(timeStamp, eventType, specificData);
     }
 
