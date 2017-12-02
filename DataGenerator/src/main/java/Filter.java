@@ -141,7 +141,7 @@ public class Filter{
         buildData.put(++buildTargetCount, localBTMap);
       }
 
-      specificData.put("build_data", buildData);
+      specificData.put("ListOfBuilds", buildData);
 
     } else if(event instanceof DebuggerEvent){
       DebuggerEvent de = (DebuggerEvent) event;
@@ -155,7 +155,7 @@ public class Filter{
       IDEStateEvent idse = (IDEStateEvent) event;
 
       eventType = "LifeCyclePhase";
-      specificData.put("state", idse.IDELifecyclePhase.toString());
+      specificData.put("State", idse.IDELifecyclePhase.toString());
 
     } else if(event instanceof ErrorEvent){
       ErrorEvent ee = (ErrorEvent)event;
@@ -183,7 +183,7 @@ public class Filter{
       }
 
       System.out.println("Number of test cases: " + testCount);
-      specificData.put("Tests", testResults);
+      specificData.put("ListOfTests", testResults);
     } else{
       // Looking at an undesired event so do nothing
 		}
