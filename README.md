@@ -33,6 +33,8 @@ To find out more about what each event is, go to [Kave Events Specification]
   + ListOfTests
     + Duration
     + Result
+7. VersionControlEvent
+  + Action
 
 ### Installation and use
 
