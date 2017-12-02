@@ -5,7 +5,7 @@ import org.json.simple.JSONObject;
 
 public class JSONWriter{
 
-  public void writeToJSONFile(JSONObject jsonObject, String fileName){
+  public static void writeToJSONFile(JSONObject jsonObject, String fileName){
     try {
       FileWriter fileWriter = new FileWriter("output/" + fileName + ".json");
       fileWriter.write(jsonObject.toJSONString());
