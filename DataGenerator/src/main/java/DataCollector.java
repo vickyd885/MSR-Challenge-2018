@@ -9,9 +9,15 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.Set;
 
-// time library
+// java time library - this is what kave uses
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+
+
+// joda time library
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.joda.time.Period;
@@ -24,11 +30,16 @@ public class DataCollector{
 
   private DateTime start;
 
+  private TreeMap<ZonedDateTime, JSONObject> tmap;
+
+  private DateTimeFormatter dformat = DateTimeFormatter.ofPattern("HHmm:ss, dd MMM yyyy");
+
   public DataCollector(String fileName){
     this.parent = new JSONObject();
     this.fileName = fileName;
     this.entryCount = 0;
     this.start = new DateTime();
+    this.tmap = new TreeMap<ZonedDateTime, JSONObject>();
   }
 
   // Adds a number : [...] to help with order
@@ -37,12 +48,16 @@ public class DataCollector{
     String eventType,
     HashMap<String, Object> specificData
   ){
-    this.parent.put(
-      ++this.entryCount,
+    ZonedDateTime zdt = ZonedDateTime.parse(timeStamp);
+
+    this.tmap.put(
+      zdt,
       addNewEntry(timeStamp, eventType, specificData)
     );
 
-    System.out.println("Added new entry!");
+    ++this.entryCount;
+
+    //System.out.println("Added new entry!");
   }
 
   // Creates the actual json object
@@ -76,6 +91,7 @@ public class DataCollector{
   }
   // Write all the json data to the file
   public void flushData(){
+    populateJSONBody();
     JSONWriter.writeToJSONFile(this.parent, this.fileName);
   }
 
@@ -87,6 +103,24 @@ public class DataCollector{
     System.out.println("Time taken for user " + this.fileName +
       " was ... " + period.getSeconds() +
       " (seconds)!");
+  }
+
+  public void showAllKeysInTM(){
+    Set<ZonedDateTime> dateSet = this.tmap.keySet();
+    for(ZonedDateTime zdt : dateSet){
+      System.out.println(zdt.format(dformat));
+    }
+  }
+
+  private void populateJSONBody(){
+    Set<ZonedDateTime> dateSet = this.tmap.keySet();
+    int i = 0;
+    for(ZonedDateTime zdt : dateSet){
+      this.parent.put(
+        ++i,
+        this.tmap.get(zdt)
+      );
+    }
   }
 
 }
