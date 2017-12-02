@@ -1,3 +1,8 @@
+/*
+* FileWriter writes the json object to file
+* the hardcoded file location is "/output"
+*/
+
 import java.io.FileWriter;
 
 import org.json.simple.JSONArray;
