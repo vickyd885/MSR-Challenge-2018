@@ -21,6 +21,7 @@ import cc.kave.commons.model.events.versioncontrolevents.VersionControlActionTyp
 import cc.kave.commons.utils.json.JsonUtils;
 import cc.recommenders.io.ReadingArchive;
 
+import java.time.Duration;
 
 
 
@@ -28,22 +29,16 @@ public class Filter{
 
   private static final String DIR_USERDATA = "/Users/VickyD/Desktop/Year4/ToolsAndEnvironments/ToolsCW/Events-170301/";
 
-  private static int limit = 0;
-
-
+  // limit to stop adding events to. Useful for debugging
+  private static int eventLimit = 500;
+  // Number of users processed, used for setting the file name, e.g 1.json
   private static int userCount = 0;
 
   public static void main(String[] args) {
 
-    //readPlainEvents();
-
-    // List<String> users = findAllUsers();
-    //
-    // //for(String x : users) System.out.println(x);
-    //
-    // System.out.println("Running");
-
+    System.out.println("Filter started @ " +);
     readPlainEvents();
+    System.out.println("Filter ended @");
   }
 
   /**
@@ -107,7 +102,7 @@ public class Filter{
 				// Not all event bindings are very stable already, reading the
 				// JSON helps debugging possible bugs in the bindings
 
-        if(limit > 500) break;
+        if(eventCount > 5) break;
 
 			}
 			ra.close();
@@ -183,6 +178,8 @@ public class Filter{
 
       Set<TestCaseResult> tests = tre.Tests;
 
+
+
       int testCount = 0;
       for(TestCaseResult tcr : tests){
         HashMap<String, Object> localTestResult = new HashMap<String, Object>();
@@ -190,14 +187,18 @@ public class Filter{
         localTestResult.put("Result", tcr.Result.toString());
         testResults.put(++testCount, localTestResult);
       }
+
+      System.out.println("Number of test cases: " + testCount);
       specificData.put("Tests", testResults);
     } else{
-      // Looking at an undesired event
+      // Looking at an undesired event so do nothing
 		}
 
+    // if the eventType is not set, then we're not interested in the event,
+    // and so it doesnt get added to the json
     if(eventType != null){
       dc.handleNewEntry(timeStamp, eventType, specificData);
-      limit++;
+      //eventCount++;
     }
 
 
