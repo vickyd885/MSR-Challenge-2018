@@ -4,6 +4,10 @@
      <pathelement location="lib/kave-java-imports.jar" />
    </path>
 
+   <path id="jsonjar">
+     <pathelement location="lib/json-simple-1.1.1.jar" />
+   </path>
+
    <path id="classfiles">
      <pathelement location="target" />
    </path>
@@ -27,6 +31,7 @@
    <target name="compile" depends="prepare">
      <javac srcdir="${sourceDir}" destdir="${outputDir}" debug="on">
        <classpath refid="uberjar" />
+       <classpath refid="jsonjar" />
      </javac>
    </target>
    <target name="run" depends="compile,init">
