@@ -54,7 +54,7 @@ public class Filter{
     List<String> zips = Lists.newLinkedList();
     for (File f : FileUtils.listFiles(new File(DIR_USERDATA), new String[] { "zip" }, true)) {
       zips.add(f.getAbsolutePath());
-      break;
+      //break;
     }
     return zips;
   }
@@ -88,7 +88,7 @@ public class Filter{
 			}
 			ra.close();
       dc.flushData();
-      //dc.printTimeInfo();
+      dc.printTimeInfo();
       //dc.showAllKeysInTM();
 		}
 	}
