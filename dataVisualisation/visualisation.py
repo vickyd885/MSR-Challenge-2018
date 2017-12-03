@@ -117,14 +117,20 @@ def testrunEventGraph(data):
 	return;
 
 
-def editOutcomeGraph(time, outcome, size, label1, label2):
+def editOutcomeGraph(time, outcome, size, s, o):
 	fig, ax1 = plt.subplots()
 	ax2 = ax1.twinx()
-	ax1.plot(time, size, color='b')
+	ax1.set_title('Frequency of ' + o + ' and ' + s + ' edits over time')
+	a1 = ax1.plot(time, size, color='b', label='Edits')
 	ax1.set_xlabel('time')
-	ax1.set_ylabel('Frequency of ' + label1 + ' edits')
-	ax2.plot(time, outcome, color='r')
-	ax2.set_ylabel('Frequency of ' + label2)
+	ax1.set_ylabel('Frequency of ' + o + ' edits')
+	a2 = ax2.plot(time, outcome, color='r', label=o)
+	ax2.set_ylabel('Frequency of ' + s)
+	#ax1.set_xticks(time[0::5])
+	#ax2.set_xticks(time[0::5])
+	a = a1 + a2
+	labs = [l.get_label() for l in a]
+	ax1.legend(a, labs, loc=0)
 	plt.show()
 	return;
 
