@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.Queue;
+import java.util.Comparator;
+import java.util.PriorityQueue;
 
 import org.apache.commons.io.FileUtils;
 import com.google.common.collect.Lists;
@@ -32,7 +35,7 @@ import java.time.Duration;
 
 public class Filter{
 
-  private static final String DIR_USERDATA = "/cs/student/ug4/2014/vdineshc/Desktop/tools/ToolsCW/Events-170301/";
+  private static final String DIR_USERDATA = "/Users/VickyD/Desktop/Year4/ToolsAndEnvironments/ToolsCW/Events-170301/";
 
   // limit to stop adding events to. Useful for debugging
   private static int eventLimit = 500;
@@ -44,17 +47,54 @@ public class Filter{
     readPlainEvents();
   }
 
+  /*
+  * Build a queue based on size of file, so processes can happen faster
+  *
+  */
+  public static Queue<String> prepareReadQueue(List<String> files){
+
+     Queue<String> fileQueue = new PriorityQueue<>(5,fileSizeComparator);
+
+    for(String fileName : files){
+      // System.out.println(fileName);
+      // File f = new File(fileName);
+      // System.out.println(f.length());
+      fileQueue.offer(fileName);
+    }
+
+    return fileQueue;
+
+    // System.out.println("file queue...");
+    //
+    // // while(!fileQueue.isEmpty()){
+    // //   System.out.println(fileQueue.poll());
+    // // }
+    //
+    // System.out.println("...end of file queue!");
+  }
+
+  // Custom compartor to compare the file sizes
+  public static Comparator<String> fileSizeComparator = new Comparator<String>(){
+    @Override
+    public int compare(String s1, String s2) {
+            File f1 = new File(s1);
+            File f2 = new File(s2);
+
+            return (int) (f1.length() - f2.length());
+        }
+    };
+
+
   /**
   * 1: Find all users in the dataset.
   */
-  public static List<String> findAllUsers() {
+  public static  List<String> findAllUsers() {
   // This step is straight forward, as events are grouped by user. Each
   // .zip file in the dataset corresponds to one user.
 
     List<String> zips = Lists.newLinkedList();
     for (File f : FileUtils.listFiles(new File(DIR_USERDATA), new String[] { "zip" }, true)) {
       zips.add(f.getAbsolutePath());
-    
     }
     return zips;
   }
@@ -65,20 +105,31 @@ public class Filter{
 	public static void readPlainEvents() {
 		// the example is basically the same as before, but...
 		List<String> userZips = findAllUsers();
+    Queue<String> fileQueue = prepareReadQueue(userZips);
 
-		for (String user : userZips) {
+		while(!fileQueue.isEmpty()){
 
-      System.out.println(user);
+      //System.out.println(user);
 
-	String folderName = user.split("/")[10];
-	folderName += "/";
-	folderName += Integer.toString(++userCount);
+      String user = fileQueue.poll();
 
-	System.out.println(folderName);
+      String folderName = null;
+      try{
+        folderName = user.split("/")[8];
+        folderName += "/";
+        folderName += Integer.toString(++userCount);
+      } catch(Exception e){
+        System.out.println("Caught an exception for ... " + user);
+      }
+
+      if(folderName == null) continue;
+
+      //System.out.println(folderName);
 
       DataCollector dc = new DataCollector(folderName);
 			ReadingArchive ra = new ReadingArchive(new File(user));
 			while (ra.hasNext()) {
+
 				// ... sometimes it is easier to just read the JSON...
 				String json = ra.getNextPlain();
 				// .. and call the deserializer yourself.
