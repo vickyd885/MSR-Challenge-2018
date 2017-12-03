@@ -32,7 +32,7 @@ import java.time.Duration;
 
 public class Filter{
 
-  private static final String DIR_USERDATA = "/Users/VickyD/Desktop/Year4/ToolsAndEnvironments/ToolsCW/Events-170301/";
+  private static final String DIR_USERDATA = "/cs/student/ug4/2014/vdineshc/Desktop/tools/ToolsCW/Events-170301/";
 
   // limit to stop adding events to. Useful for debugging
   private static int eventLimit = 500;
@@ -54,7 +54,7 @@ public class Filter{
     List<String> zips = Lists.newLinkedList();
     for (File f : FileUtils.listFiles(new File(DIR_USERDATA), new String[] { "zip" }, true)) {
       zips.add(f.getAbsolutePath());
-      //break;
+    
     }
     return zips;
   }
@@ -68,7 +68,15 @@ public class Filter{
 
 		for (String user : userZips) {
 
-      DataCollector dc = new DataCollector(Integer.toString(++userCount));
+      System.out.println(user);
+
+	String folderName = user.split("/")[10];
+	folderName += "/";
+	folderName += Integer.toString(++userCount);
+
+	System.out.println(folderName);
+
+      DataCollector dc = new DataCollector(folderName);
 			ReadingArchive ra = new ReadingArchive(new File(user));
 			while (ra.hasNext()) {
 				// ... sometimes it is easier to just read the JSON...
