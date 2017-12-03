@@ -101,7 +101,7 @@ public class Filter{
 
 			}
 			ra.close();
-      //dc.flushData();
+      dc.flushData();
       dc.printTimeInfo();
       //dc.showAllKeysInTM();
 		}
