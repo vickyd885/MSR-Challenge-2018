@@ -238,7 +238,7 @@ public class Filter{
     } catch(Exception e){
       System.out.println("Caught an exception for ... " + user);
     }
-    System.out.println(user);
+    System.out.println("Beginning extraction for: " + user);
     return folderName;
   }
 

@@ -6,3 +6,14 @@ Java/*.class
 
 DataFilter/target
 DataFilter/output
+
+*.class
+DataFilter/.classpath
+DataFilter/.project
+DataFilter/*.class
+
+DataGenerator/bin/.project
+
+DataFilter/target/DataCollector.class
+
+DataFilter/target/Filter.class

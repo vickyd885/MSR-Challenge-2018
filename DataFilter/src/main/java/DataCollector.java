@@ -27,9 +27,9 @@ public class DataCollector{
   private JSONObject parent; // Reference to main body
   private String fileName; // filename that wile be flushed
   private int entryCount; // reference to latest entry in json
-
+  private HashMap<String, Integer> eventTypes; //keep occurrences of event types found
   private DateTime start;
-
+  private static int objectsFound = 0; // amount of JSONS found in this run, static as this needs to be shared across all instances
   private TreeMap<ZonedDateTime, JSONObject> tmap;
 
   private DateTimeFormatter dformat = DateTimeFormatter.ofPattern("HHmm:ss, dd MMM yyyy");
@@ -40,6 +40,7 @@ public class DataCollector{
     this.entryCount = 0;
     this.start = new DateTime();
     this.tmap = new TreeMap<ZonedDateTime, JSONObject>();
+    this.eventTypes = new HashMap<String, Integer>();
   }
 
   // Adds a number : [...] to help with order
@@ -71,7 +72,13 @@ public class DataCollector{
 
     newEntry.put("time_stamp", timeStamp);
     newEntry.put("event_type", eventType);
-
+    
+    if(eventTypes.containsKey(eventType)==false){ //This event type is new, so initialise the value to 1
+    	eventTypes.put(eventType, 1);
+    }else{
+    	eventTypes.put(eventType, eventTypes.get(eventType)+1);
+    }
+    
     JSONObject specificDataObj = new JSONObject();
 
     Set<String> keySet = specificDataMap.keySet();
@@ -100,9 +107,12 @@ public class DataCollector{
     DateTime now = new DateTime();
     Interval interval = new Interval(this.start, now);
     Period period = interval.toPeriod();
+    objectsFound++;
+    System.out.println("Event types found for user " + this.fileName + ": " + eventTypes);
     System.out.println("Time taken for user " + this.fileName +
-      " was ... " + period.getSeconds() +
-      " (seconds)!");
+      " was " + period.getSeconds() +
+      " seconds");
+    System.out.println("Objects found so far: " + objectsFound);
   }
 
   public void showAllKeysInTM(){
