@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.Queue;
+import java.util.Comparator;
+import java.util.PriorityQueue;
 
 import org.apache.commons.io.FileUtils;
 import com.google.common.collect.Lists;
@@ -16,23 +19,19 @@ import com.google.common.collect.Lists;
 import cc.kave.commons.model.events.visualstudio.*;
 import cc.kave.commons.model.events.testrunevents.*;
 import cc.kave.commons.model.events.ErrorEvent;
-
-
-import cc.kave.commons.model.events.IIDEEvent;
 import cc.kave.commons.model.events.versioncontrolevents.VersionControlEvent;
 import cc.kave.commons.model.events.versioncontrolevents.VersionControlAction;
 import cc.kave.commons.model.events.versioncontrolevents.VersionControlActionType;
+
+
+//Other KAVE imports
+import cc.kave.commons.model.events.IIDEEvent;
 import cc.kave.commons.utils.json.JsonUtils;
 import cc.recommenders.io.ReadingArchive;
 
-import java.time.Duration;
-
-// time libaries for debugging
-
-
 public class Filter{
 
-  private static final String DIR_USERDATA = "/Users/VickyD/Desktop/Year4/ToolsAndEnvironments/ToolsCW/Events-170301/";
+  private static String DIR_USERDATA; // "/Users/VickyD/Desktop/Year4/ToolsAndEnvironments/ToolsCW/Events-170301/";
 
   // limit to stop adding events to. Useful for debugging
   private static int eventLimit = 500;
@@ -40,55 +39,76 @@ public class Filter{
   private static int userCount = 0;
 
   public static void main(String[] args) {
+    if(args.length == 0){
+      System.out.println("You forgot to specify the dataset path");
+    }else if(args.length > 1){
+      System.out.println("Too many arguments!");
+    }
+
+    DIR_USERDATA = args[0];
 
     readPlainEvents();
   }
 
   /**
-  * 1: Find all users in the dataset.
+  * Find all users in the dataset.
   */
-  public static List<String> findAllUsers() {
+  public static  List<String> findAllUsers() {
   // This step is straight forward, as events are grouped by user. Each
   // .zip file in the dataset corresponds to one user.
 
     List<String> zips = Lists.newLinkedList();
     for (File f : FileUtils.listFiles(new File(DIR_USERDATA), new String[] { "zip" }, true)) {
       zips.add(f.getAbsolutePath());
-      break;
     }
     return zips;
   }
 
+
 	/**
-	 * 3: Reading the plain JSON representation
+	 * Reading the plain JSON representation
 	 */
 	public static void readPlainEvents() {
 		// the example is basically the same as before, but...
 		List<String> userZips = findAllUsers();
+    Queue<String> fileQueue = prepareReadQueue(userZips);
 
-		for (String user : userZips) {
+		while(!fileQueue.isEmpty()){
 
-      DataCollector dc = new DataCollector(Integer.toString(++userCount));
+      //System.out.println(user);
+
+      String user = fileQueue.poll();
+      String folderName = createFilePath(user);
+
+      if(folderName == null) continue;
+
+      //System.out.println(folderName);
+
+      DataCollector dc = new DataCollector(folderName);
 			ReadingArchive ra = new ReadingArchive(new File(user));
 			while (ra.hasNext()) {
+
 				// ... sometimes it is easier to just read the JSON...
 				String json = ra.getNextPlain();
 				// .. and call the deserializer yourself.
-				IIDEEvent e = JsonUtils.fromJson(json, IIDEEvent.class);
-
         // Process the event
-        process(e, dc);
+        try{
+				  IIDEEvent e = JsonUtils.fromJson(json, IIDEEvent.class);
+          process(e, dc);
+        }catch(Exception e){
+          System.out.println("CAUGHT AN EXCEPTION ON PARSING THE JSON!");
+        }
 
-				// Not all event bindings are very stable already, reading the
-				// JSON helps debugging possible bugs in the bindings
+
 
         // Uncomment to stop at a certain event count
-        //if(dc.getNumOfEvents() > 5) break;
+        //if(dc.getNumOfEvents() > 10) break;
 
 			}
 			ra.close();
       dc.flushData();
       dc.printTimeInfo();
+      //dc.showAllKeysInTM();
 		}
 	}
 
@@ -110,6 +130,7 @@ public class Filter{
     // In the end, if eventType is still null, then we don't add the event to
     // json.
     String timeStamp = event.getTriggeredAt().toString();
+
     String eventType = null;
     HashMap<String, Object> specificData = new HashMap<String, Object>();
 
@@ -182,23 +203,74 @@ public class Filter{
         testResults.put(++testCount, localTestResult);
       }
 
-      System.out.println("Number of test cases: " + testCount);
+      //System.out.println("Number of test cases: " + testCount);
       specificData.put("ListOfTests", testResults);
+    } else if(event instanceof VersionControlEvent){
+      VersionControlEvent vce = (VersionControlEvent) event;
+
+      //System.out.println(vce);
+      List<VersionControlAction> listOfvca = vce.Actions;
+
+      // System.out.println("List of VCA");
+      for(VersionControlAction vca : listOfvca){
+        eventType = "VersionControlEvent";
+        timeStamp = vca.ExecutedAt.toString();
+        specificData.put("Action", vca.ActionType.toString());
+        dc.handleNewEntry(timeStamp, eventType, specificData);
+      }
+
     } else{
       // Looking at an undesired event so do nothing
 		}
 
     // if the eventType is not set, then we're not interested in the event,
     // and so it doesnt get added to the json
-    if(eventType != null){
+    // we don't add version control events because that's handled in else if case
+    if(eventType != null && !eventType.equals("VersionControlEvent")){
       dc.handleNewEntry(timeStamp, eventType, specificData);
     }
-
-
 	}
 
 
+  public static String createFilePath(String user){
+    String folderName = null;
+    try{
+      String[] fractions = user.split("/");
+      // the containing folder is always 2 less
+      folderName = fractions[fractions.length-2];
+      folderName += "/";
+      folderName += Integer.toString(++userCount);
+    } catch(Exception e){
+      System.out.println("Caught an exception for ... " + user);
+    }
+    System.out.println("Beginning extraction for: " + user);
+    return folderName;
+  }
 
+  /*
+  * Build a queue based on size of file, so processes can happen faster
+  *
+  */
+  public static Queue<String> prepareReadQueue(List<String> files){
+    Queue<String> fileQueue = new PriorityQueue<>(5,fileSizeComparator);
+
+    for(String fileName : files){
+      fileQueue.offer(fileName);
+    }
+
+    return fileQueue;
+  }
+
+  // Custom compartor to compare the file sizes
+  public static Comparator<String> fileSizeComparator = new Comparator<String>(){
+    @Override
+    public int compare(String s1, String s2) {
+            File f1 = new File(s1);
+            File f2 = new File(s2);
+
+            return (int) (f1.length() - f2.length());
+        }
+    };
 
 
 

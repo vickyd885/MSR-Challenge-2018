@@ -4,7 +4,18 @@ Events-170301/
 
 Java/*.class
 
-DataGenerator/target
-DataGenerator/output
+DataFilter/target
+DataFilter/output
 
 SizeClassification/output
+
+*.class
+DataFilter/.classpath
+DataFilter/.project
+DataFilter/*.class
+
+DataGenerator/bin/.project
+
+DataFilter/target/DataCollector.class
+
+DataFilter/target/Filter.class

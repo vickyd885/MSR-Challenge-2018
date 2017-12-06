@@ -42,6 +42,7 @@
    <target name="run" depends="compile,init">
      <java classname="Filter" classpathref="runtime.path">
        <classpath refid="classfiles"/>
+       <arg value="${arg0}"/>
      </java>
   </target>
 </project>

@@ -2,12 +2,11 @@
 
 In an attempt to answer the most important question of all time, **"Do large changes to source code have a negative impact on software engineering?"**, here is the code base to make use of the Mining Repository API.
 
-## DataGenerator
+## Data Filtering
 
-This module filters for this set of data from the Events Dataset.
+First we need to filter events from the Events Dataset, keeping those we are relevant to answering the question.
 
 To find out more about what each event is, go to [Kave Events Specification]
-
 
 1. EditEvent
   + NumberOfChanges
@@ -33,23 +32,23 @@ To find out more about what each event is, go to [Kave Events Specification]
   + ListOfTests
     + Duration
     + Result
+7. VersionControlEvent
+  + Action
 
 ### Installation and use
 
-The first part requires use to filter data from the massive zip file. Code for this can be found in the `DataGenerator` folder.
+The first part requires use to filter data from the massive zip file. Code for this can be found in the `DataFilter` folder.
 
-We use ant to build the project and make use of an uberjar with all the required files.
+We use **ant** to build the project and make use of an uberjar with all the required files.
 
-The only file you should need to change (for now) is,
-`DataGenerator/src/main/java/Filter.java`.
+Download and unzip the [Events dataset] into the root of the repo.
 
-You need to update the _directory path_ inside the Filter.java folder to point to your massive zip folder.
+```shell
+cd DataFilter
+ant -Dargs9=$path_to_Events_Dataset
+```
 
-**TODO:** update this to use args
-
-To run, simply call `ant` in `/DataGenerator`.
-
-For every user, the program will dump the associated data file in `DataGenerator/output/$userCount.json`
+Results will be dumped into `DataFilter/output/_user_name_/*.json`
 
 The output json format looks like this:
 
@@ -65,8 +64,7 @@ The output json format looks like this:
   ]
 }
 ```
-The intention is that you can use the `event_type` to access the keys in `specific_data`
-as its dependent on it.
+The intention is that you can use the `event_type` to access the keys in `specific_data` as its dependent on it. (Exact info is listed above ^)
 
 ## To Do List
 
@@ -75,3 +73,5 @@ as its dependent on it.
 
 
 [Kave Events Specification]: http://www.kave.cc/feedbag/event-generation
+
+[Events dataset]: http://www.kave.cc/datasets
