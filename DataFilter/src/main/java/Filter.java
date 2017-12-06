@@ -91,10 +91,15 @@ public class Filter{
 				// ... sometimes it is easier to just read the JSON...
 				String json = ra.getNextPlain();
 				// .. and call the deserializer yourself.
-				IIDEEvent e = JsonUtils.fromJson(json, IIDEEvent.class);
-
         // Process the event
-        process(e, dc);
+        try{
+				  IIDEEvent e = JsonUtils.fromJson(json, IIDEEvent.class);
+          process(e, dc);
+        }catch(Exception e){
+          System.out.println("CAUGHT AN EXCEPTION ON PARSING THE JSON!");
+        }
+
+
 
         // Uncomment to stop at a certain event count
         //if(dc.getNumOfEvents() > 10) break;
