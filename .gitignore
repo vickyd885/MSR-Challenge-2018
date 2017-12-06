@@ -6,3 +6,5 @@ Java/*.class
 
 DataGenerator/target
 DataGenerator/output
+
+SizeClassification/output
