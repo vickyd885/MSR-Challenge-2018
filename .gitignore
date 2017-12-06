@@ -7,6 +7,8 @@ Java/*.class
 DataFilter/target
 DataFilter/output
 
+SizeClassification/output
+
 *.class
 DataFilter/.classpath
 DataFilter/.project
