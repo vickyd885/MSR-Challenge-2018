@@ -4,10 +4,13 @@ import numpy as np
 import plotly
 import plotly.graph_objs as go
 
-rootdir = '/Users/jasminelu/Desktop/ToolsCW/DataAnalysis/output'
+rootdir = '/Users/jasminelu/Desktop/ToolsCW/SizeClassification/output'
 
 numberOfChanges = []
 sizeOfChanges = []
+
+numberOfChangesLog = []
+sizeOfChangesLog = []
 
 def loop_through_files():
     for subdir, dirs, files in os.walk(rootdir):
@@ -20,13 +23,32 @@ def loop_through_files():
 def extract_edit_event_data(obj):
     for item in obj.values():
         if item['event_type'] == 'EditEvent':
-            numberOfChanges.append(np.log(item['specific_data']['NumberOfChanges']))
-            sizeOfChanges.append(item['specific_data']['SizeOfChanges'])
+            if item['specific_data']['NumberOfChanges'] > 0 and item['specific_data']['SizeOfChanges'] > 0:
+                numberOfChanges.append(item['specific_data']['NumberOfChanges'])
+                sizeOfChanges.append(item['specific_data']['SizeOfChanges'])
+                numberOfChangesLog.append(np.log(item['specific_data']['NumberOfChanges']))
+                sizeOfChangesLog.append(np.log(item['specific_data']['SizeOfChanges']))
+
+def print_size_classification(array):
+    print len(sizeOfChanges)
+    q0, q25, q50, q75, q100 = np.percentile(array, [0, 25, 50, 75, 100])
+    iqr = q75 - q25
+
+    print "q0: ", q0
+    print "q25: ", q25
+    print "q50: ", q50
+    print "q75: ", q75
+    print "q100: ", q100
+    print "x-small: ", q0, "-", q25
+    print "small: ", q25, "-", q75
+    print "medium: ", q75, "-", (iqr*1.5)+q75
+    print "large: ", (iqr*1.5)+q75, "-", (iqr*3)+q75
+    print "x-large: >", (iqr*3)+q75
 
 def plot_scatter():
     trace = go.Scatter(
-        x = numberOfChanges,
-        y = sizeOfChanges,
+        x = numberOfChangesLog,
+        y = sizeOfChangesLog,
         mode = 'markers'
     )
 
@@ -44,7 +66,7 @@ def plot_scatter():
 
 def plot_histogram_number_of_changes():
     trace = go.Histogram(
-        x = numberOfChanges
+        x = numberOfChangesLog
     )
 
     plot_data = [trace]
@@ -61,7 +83,7 @@ def plot_histogram_number_of_changes():
 
 def plot_histogram_size_of_changes():
     trace = go.Histogram(
-        x = sizeOfChanges
+        x = sizeOfChangesLog
     )
 
     plot_data = [trace]
@@ -81,11 +103,12 @@ def plot(data, layout, filename):
     plotly.offline.plot(fig, filename=filename)
 
 def box_plot_size_of_changes():
-    SizeOfChanges = go.Box(
-        x = sizeOfChanges
+    trace = go.Box(
+        x = sizeOfChangesLog,
+        boxpoints = False
     )
 
-    plot_data = [SizeOfChanges]
+    plot_data = [trace]
 
     layout = go.Layout(
         font=dict(family='Times', size=16)
@@ -94,14 +117,26 @@ def box_plot_size_of_changes():
     plot(plot_data, layout, 'box-plot-size')
 
 def box_plot_number_of_changes():
-    NumberOfChanges = go.Box(x=numberOfChanges)
-    plot_data = [NumberOfChanges]
-    plot(plot_data, {}, 'box-plot-number')
+    trace = go.Box(
+        x = numberOfChangesLog,
+        boxpoints = False
+    )
+
+    plot_data = [trace]
+
+    layout = go.Layout(
+        font=dict(family='Times', size=16)
+    )
+
+    plot(plot_data, layout, 'box-plot-number')
 
 
 loop_through_files()
+print_size_classification(sizeOfChanges)
+print_size_classification(numberOfChanges)
+
 box_plot_size_of_changes()
-# plot_scatter()
-# plot_histogram_size_of_changes()
-# plot_histogram_number_of_changes()
-# box_plot_number_of_changes()
+plot_scatter()
+plot_histogram_size_of_changes()
+plot_histogram_number_of_changes()
+box_plot_number_of_changes()
