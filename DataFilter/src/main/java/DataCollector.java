@@ -9,7 +9,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.util.HashMap;
-import java.util.TreeMap;
 import java.util.Set;
 
 // java time library - this is what kave uses
@@ -30,7 +29,6 @@ public class DataCollector{
   private HashMap<String, Integer> eventTypes; //keep occurrences of event types found
   private DateTime start;
   private static int objectsFound = 0; // amount of JSONS found in this run, static as this needs to be shared across all instances
-  private TreeMap<ZonedDateTime, JSONObject> tmap;
 
   private DateTimeFormatter dformat = DateTimeFormatter.ofPattern("HHmm:ss, dd MMM yyyy");
 
@@ -39,7 +37,6 @@ public class DataCollector{
     this.fileName = fileName;
     this.entryCount = 0;
     this.start = new DateTime();
-    this.tmap = new TreeMap<ZonedDateTime, JSONObject>();
     this.eventTypes = new HashMap<String, Integer>();
   }
 
@@ -49,14 +46,11 @@ public class DataCollector{
     String eventType,
     HashMap<String, Object> specificData
   ){
-    ZonedDateTime zdt = ZonedDateTime.parse(timeStamp);
 
-    this.tmap.put(
-      zdt,
+    this.parent.put(
+      ++this.entryCount,
       addNewEntry(timeStamp, eventType, specificData)
     );
-
-    ++this.entryCount;
 
     //System.out.println("Added new entry!");
   }
@@ -72,13 +66,13 @@ public class DataCollector{
 
     newEntry.put("time_stamp", timeStamp);
     newEntry.put("event_type", eventType);
-    
+
     if(eventTypes.containsKey(eventType)==false){ //This event type is new, so initialise the value to 1
     	eventTypes.put(eventType, 1);
     }else{
     	eventTypes.put(eventType, eventTypes.get(eventType)+1);
     }
-    
+
     JSONObject specificDataObj = new JSONObject();
 
     Set<String> keySet = specificDataMap.keySet();
@@ -98,7 +92,6 @@ public class DataCollector{
   }
   // Write all the json data to the file
   public void flushData(){
-    populateJSONBody();
     JSONWriter.writeToJSONFile(this.parent, this.fileName);
   }
 
@@ -115,22 +108,6 @@ public class DataCollector{
     System.out.println("Objects found so far: " + objectsFound);
   }
 
-  public void showAllKeysInTM(){
-    Set<ZonedDateTime> dateSet = this.tmap.keySet();
-    for(ZonedDateTime zdt : dateSet){
-      System.out.println(zdt.format(dformat));
-    }
-  }
 
-  private void populateJSONBody(){
-    Set<ZonedDateTime> dateSet = this.tmap.keySet();
-    int i = 0;
-    for(ZonedDateTime zdt : dateSet){
-      this.parent.put(
-        ++i,
-        this.tmap.get(zdt)
-      );
-    }
-  }
 
 }

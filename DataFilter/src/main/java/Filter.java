@@ -205,20 +205,6 @@ public class Filter{
 
       //System.out.println("Number of test cases: " + testCount);
       specificData.put("ListOfTests", testResults);
-    } else if(event instanceof VersionControlEvent){
-      VersionControlEvent vce = (VersionControlEvent) event;
-
-      //System.out.println(vce);
-      List<VersionControlAction> listOfvca = vce.Actions;
-
-      // System.out.println("List of VCA");
-      for(VersionControlAction vca : listOfvca){
-        eventType = "VersionControlEvent";
-        timeStamp = vca.ExecutedAt.toString();
-        specificData.put("Action", vca.ActionType.toString());
-        dc.handleNewEntry(timeStamp, eventType, specificData);
-      }
-
     } else{
       // Looking at an undesired event so do nothing
 		}
@@ -226,7 +212,7 @@ public class Filter{
     // if the eventType is not set, then we're not interested in the event,
     // and so it doesnt get added to the json
     // we don't add version control events because that's handled in else if case
-    if(eventType != null && !eventType.equals("VersionControlEvent")){
+    if(eventType != null ){
       dc.handleNewEntry(timeStamp, eventType, specificData);
     }
 	}
