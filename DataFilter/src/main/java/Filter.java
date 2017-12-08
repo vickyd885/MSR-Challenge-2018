@@ -164,27 +164,6 @@ public class Filter{
 
       specificData.put("ListOfBuilds", buildData);
 
-    } else if(event instanceof DebuggerEvent){
-      DebuggerEvent de = (DebuggerEvent) event;
-      eventType = "DebuggerEvent";
-
-      specificData.put("DebuggerMode", de.Mode.toString());
-      specificData.put("Reason", de.Reason);
-      specificData.put("Action", de.Action);
-
-    } else if(event instanceof IDEStateEvent){
-      IDEStateEvent idse = (IDEStateEvent) event;
-
-      eventType = "LifeCyclePhase";
-      specificData.put("State", idse.IDELifecyclePhase.toString());
-
-    } else if(event instanceof ErrorEvent){
-      ErrorEvent ee = (ErrorEvent)event;
-
-      eventType = "ErrorEvent";
-      specificData.put("Content", ee.Content);
-      specificData.put("StackTrace", ee.StackTrace);
-
     } else if(event instanceof TestRunEvent){
       TestRunEvent tre = (TestRunEvent) event;
 
@@ -193,9 +172,11 @@ public class Filter{
 
       HashMap<Integer, Object> testResults = new HashMap<Integer, Object>();
 
+      // Access the actual tests
       Set<TestCaseResult> tests = tre.Tests;
 
       int testCount = 0;
+
       for(TestCaseResult tcr : tests){
         HashMap<String, Object> localTestResult = new HashMap<String, Object>();
         localTestResult.put("Duration", tcr.Duration.toString());
