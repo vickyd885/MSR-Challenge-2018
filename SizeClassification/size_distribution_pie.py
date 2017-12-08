@@ -11,6 +11,8 @@ medium = 0
 large = 0
 x_large = 0
 
+total_events = 0
+
 def loop_through_files():
     for subdir, dirs, files in os.walk(rootdir):
         for file in files:
@@ -25,10 +27,12 @@ def loop_through_files():
     print "large: ", large
     print "x_large: ", x_large
 
+
 def enumerate_size_of_changes(obj):
-    global x_small, small, medium, large, x_large
+    global x_small, small, medium, large, x_large, total_events
     for item in obj.values():
         if item['event_type'] == 'EditEvent':
+            total_events += 1
             if item['specific_data']['SizeOfChanges'] < 6:
                 x_small += 1
             elif item['specific_data']['SizeOfChanges'] >= 6 and item['specific_data']['SizeOfChanges'] < 240:
@@ -47,4 +51,5 @@ def plot_pie_chart():
     plotly.offline.plot([trace], filename='pie-chart-sizes')
 
 loop_through_files()
+print total_events
 plot_pie_chart()
