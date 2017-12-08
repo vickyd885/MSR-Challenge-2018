@@ -1,12 +1,20 @@
-# Tools & Env CW
+# Mining Software Repositories Challenge 2018 
 
-In an attempt to answer the most important question of all time, **"Do large changes to source code have a negative impact on software engineering?"**, here is the code base to make use of the Mining Repository API.
+This repository supplements our report for Tools and Environment Coursework 2. (This is **not** an actual submission for the MSR 2018 Mining Challenge.) 
+
+Research question: **"Do large changes to source code have a negative impact on software engineering?"*
+
+## Overview
+
+There are two stages of importance. 
+First, we need to filter events from the Events Dataset, keeping those that are relevant to answering the question. 
+We then perform statistical analysis on the filtered dataset. You can find our results and conclusions at the end of this README.
 
 ## Data Filtering
 
-First we need to filter events from the Events Dataset, keeping those we are relevant to answering the question.
-
 To find out more about what each event is, go to [Kave Events Specification]
+
+Here are the events we are interested in and the following data we capture from the filtering stage.
 
 1. EditEvent
   + NumberOfChanges
@@ -18,26 +26,17 @@ To find out more about what each event is, go to [Kave Events Specification]
     + StartedAt
     + Duration
     + Successful
-3. DebuggerEvent
-  + DebuggerMode
-  + Reason
-  + Action
-4. IDEStateEvent
-  + State
-5. ErrorEvent
-  + Content
-  + StackTrace
-6. TestRunEvent
+3. TestRunEvent
   + WasAborted
   + ListOfTests
     + Duration
     + Result
-7. VersionControlEvent
-  + Action
 
-### Installation and use
+### Installation and usage
 
-The first part requires use to filter data from the massive zip file. Code for this can be found in the `DataFilter` folder.
+The first part requires us to filter data from the raw dataset.
+
+Code for this can be found in the `DataFilter` folder.
 
 We use **ant** to build the project and make use of an uberjar with all the required files.
 
@@ -45,10 +44,10 @@ Download and unzip the [Events dataset] into the root of the repo.
 
 ```shell
 cd DataFilter
-ant -Dargs9=$path_to_Events_Dataset
+ant -Darg0=$absolute_path_to_Events_Dataset
 ```
 
-Results will be dumped into `DataFilter/output/_user_name_/*.json`
+Results will be saved to `DataFilter/output/_user_name_/*.json`
 
 The output json format looks like this:
 
@@ -64,12 +63,12 @@ The output json format looks like this:
   ]
 }
 ```
+
 The intention is that you can use the `event_type` to access the keys in `specific_data` as its dependent on it. (Exact info is listed above ^)
 
-## To Do List
+## Statistical Analysis
 
-- Statistcal analysis
-- Write Report
+## Results & Conclusions 
 
 
 [Kave Events Specification]: http://www.kave.cc/feedbag/event-generation
