@@ -2,7 +2,7 @@
 
 This repository supplements our report for Tools and Environment Coursework 2. (This is **not** an actual submission for the MSR 2018 Mining Challenge.) 
 
-Research question: **"Do large changes to source code have a negative impact on software engineering?"*
+Research question: **Do large changes to source code have a negative impact on software projects?*
 
 ## Overview
 
@@ -67,6 +67,29 @@ The output json format looks like this:
 The intention is that you can use the `event_type` to access the keys in `specific_data` as its dependent on it. (Exact info is listed above ^)
 
 ## Statistical Analysis
+Navigate to the data visualisation folder
+
+```shell
+cd dataVisualisation
+```
+
+Make sure matplotlib is installed and the 'output' dataset is in the dataVisualisation folder
+
+To generate the graphs on the data for a single user, run 
+
+```
+python visualisation.py
+```
+
+To generate the graphs for the entire dataset, run graph.py
+
+```
+python graph.py
+```
+
+
+
+
 
 ## Results & Conclusions 
 
