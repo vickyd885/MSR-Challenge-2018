@@ -52,7 +52,7 @@ def getFreq(data, name):
 		elif event == 'TestRunEvent':
 			d = data[key]["specific_data"]["ListOfTests"]
 			for k in d:
-				if data[key]["specific_data"]["ListOfTests"][k]["Result"] != "Success":
+				if data[key]["specific_data"]["ListOfTests"][k]["Result"] == "Failed":
 					test_failures += 1
 
 		elif event == "EditEvent":
