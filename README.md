@@ -67,13 +67,38 @@ The output json format looks like this:
 The intention is that you can use the `event_type` to access the keys in `specific_data` as its dependent on it. (Exact info is listed above ^)
 
 ## Statistical Analysis
+
+This part of the project is split into two parts: `SizeClassification` and `dataVisualisation`, with corrseponding folders.
+
+The first part categorises te size of changes into extra-small to extra-large changes. The second part contains the code for analysing the impact of large code changes on software development.
+
+Before running the code, make sure the data (generated from `DataFilter`) is in a folder named `output` and in both folders.
+
+### SizeClassification
+
+Files: `size_classification.py`, `graph_plot.py`, `size_distribution_pie`
+
+`size_classification.py` filters through EditEvents and uses a five-number summary to categorise each of the sizes from extra-small to extra-large.
+
+`graph_plot.py` produces various histograms and box plot showing the distribution of all changes in relation to the size of each change.
+
+`size_distribution_pie` uses the size categories and produces a pie chart showing the percentage of each size out of all edit events.
+
+To run:
+
+```
+python size_classification.py
+python graph_plot.py
+python size_distribution_pie.py
+```
+
+### dataVisualisation
+
 Navigate to the data visualisation folder
 
 ```shell
 cd dataVisualisation
 ```
-
-Make sure matplotlib is installed and the 'output' dataset is in the dataVisualisation folder
 
 To generate the graphs on the data for a single user, run 
 
@@ -86,10 +111,6 @@ To generate the graphs for the entire dataset, run graph.py
 ```
 python graph.py
 ```
-
-
-
-
 
 ## Results & Conclusions 
 
