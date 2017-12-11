@@ -2,7 +2,7 @@
 
 This repository supplements our report for Tools and Environment Coursework 2. (This is **not** an actual submission for the MSR 2018 Mining Challenge.) 
 
-Research question: **Do large changes to source code have a negative impact on software projects?*
+Research question: Do large changes to source code have a negative impact on software projects?
 
 ## Overview
 
