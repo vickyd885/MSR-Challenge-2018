@@ -114,6 +114,17 @@ python graph.py
 
 ## Results & Conclusions 
 
+![alt text](https://github.com/vickyd885/ToolsCW/blob/master/dataVisualisation/graph1.jpg "Description goes here")
+
+![alt text](https://github.com/vickyd885/ToolsCW/blob/master/dataVisualisation/graph2.jpg "Description goes here")
+
+![alt text](https://github.com/vickyd885/ToolsCW/blob/master/dataVisualisation/graph3.jpg "Description goes here")
+
+![alt text](https://github.com/vickyd885/ToolsCW/blob/master/dataVisualisation/graph4.jpg "Description goes here")
+
+![alt text](https://github.com/vickyd885/ToolsCW/blob/master/dataVisualisation/graph5.jpg "Description goes here")
+
+![alt text](https://github.com/vickyd885/ToolsCW/blob/master/dataVisualisation/graph6.jpg "Description goes here")
 
 [Kave Events Specification]: http://www.kave.cc/feedbag/event-generation
 
