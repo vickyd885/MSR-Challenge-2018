@@ -112,7 +112,7 @@ To generate the graphs for the entire dataset, run graph.py
 python graph.py
 ```
 
-## Results & Conclusions 
+## Graphs & Visualisations 
 
 ![alt text](https://github.com/vickyd885/ToolsCW/blob/master/dataVisualisation/graph1.jpg "Description goes here")
 
